@@ -28,7 +28,7 @@ import (
 	"github.com/ripta/gxti/event/label"
 )
 
-// An Runner will run go command invocations and serialize
+// A Runner will run go command invocations and serialize
 // them if it sees a concurrency error.
 type Runner struct {
 	// once guards the runner initialization.
@@ -141,7 +141,7 @@ func (runner *Runner) runPiped(ctx context.Context, inv Invocation, stdout, stde
 
 	// Wait for all in-progress go commands to return before proceeding,
 	// to avoid load concurrency errors.
-	for i := 0; i < maxInFlight; i++ {
+	for range maxInFlight {
 		select {
 		case <-ctx.Done():
 			return ctx.Err(), ctx.Err()
@@ -426,7 +426,7 @@ func runCmdContext(ctx context.Context, cmd *exec.Cmd) (err error) {
 // cause of a hanging Go command, and then exits with log.Fatalf.
 func handleHangingGoCommand(start time.Time, cmd *exec.Cmd, resChan chan error) {
 	switch runtime.GOOS {
-	case "linux", "darwin", "freebsd", "netbsd":
+	case "linux", "darwin", "freebsd", "netbsd", "openbsd":
 		fmt.Fprintln(os.Stderr, `DETECTED A HANGING GO COMMAND
 
 			The gopls test runner has detected a hanging go command. In order to debug
